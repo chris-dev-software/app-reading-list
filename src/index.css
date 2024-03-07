@@ -16,11 +16,14 @@ body{
 }
 
 #container-books::-webkit-scrollbar{
-  @apply bg-[#181818] w-2 rounded-md
+  background-color: #181818;
+  width: 8px;
+  border-radius: 10px;
 }
 
 #container-books::-webkit-scrollbar-thumb{
-  @apply bg-zinc-950 rounded-md
+  background-color: rgb(9, 9, 11);
+  border-radius: 10px;
 }
 
 .grid-books{
