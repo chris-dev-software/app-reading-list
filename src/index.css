@@ -1,0 +1,32 @@
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html{
+  scroll-behavior: smooth;
+}
+
+body{
+  background-color: #181818;
+  color: white;
+  font-family: 'Syne Variable', sans-serif;
+}
+
+#container-books::-webkit-scrollbar{
+  @apply bg-[#181818] w-2 rounded-md
+}
+
+#container-books::-webkit-scrollbar-thumb{
+  @apply bg-zinc-950 rounded-md
+}
+
+.grid-books{
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+}
+
+
+
