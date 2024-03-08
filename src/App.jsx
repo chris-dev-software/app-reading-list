@@ -5,6 +5,10 @@ import { RiArrowRightSLine } from 'react-icons/ri'
 function App () {
   const [books, setBooks] = useState([])
   const [list, setList] = useState([])
+  const [filters, setFilters] = useState({
+    max: 0,
+    genre: 'all'
+  })
 
   useEffect(() => {
     setBooks(data.library)
@@ -30,6 +34,16 @@ function App () {
     })
   }
 
+  const handleChangeRange = (event) => {
+    const newRange = Number(event.target.value)
+    setFilters({ ...filters, max: newRange })
+  }
+
+  const handleChangeSelect = (event) => {
+    const newGenre = event.target.value
+    setFilters({ ...filters, genre: newGenre })
+  }
+
   const removeBookFromList = (ISBN) => {
     const foundBook = [...list].find(({ book }) => book.ISBN === ISBN)
 
@@ -51,7 +65,11 @@ function App () {
     })
   }
 
-  const totalBooks = [...books].filter(({ book }) => !book.inList).length
+  const filteredBooks = [...books].filter(({ book }) => {
+    return (book.pages > filters.max && (book.genre === filters.genre || filters.genre === 'all'))
+  })
+
+  const totalBooks = [...filteredBooks].filter(({ book }) => !book.inList).length
   const totalList = [...list].length
 
   return (
@@ -69,13 +87,17 @@ function App () {
           <section className='grid grid-cols-2 gap-10'>
             <div className='flex flex-col gap-5'>
               <label className='text-xl font-medium' htmlFor='pages'>Filtrar por páginas:</label>
-              <input id='pages' type='range' />
+              <input onChange={handleChangeRange} min={0} max={1000} value={filters.max} id='pages' type='range' />
             </div>
 
             <div className='flex flex-col gap-5'>
               <label className='text-xl font-medium' htmlFor='genre'>Filtrar por género:</label>
-              <select id='genre'>
-                <option value=''>Todas</option>
+              <select onChange={handleChangeSelect} className='text-black' value={filters.genre} id='genre'>
+                <option value='all'>Todas</option>
+                <option value='Fantasía'>Fantasía</option>
+                <option value='Ciencia ficción'>Ciencia ficción</option>
+                <option value='Zombies'>Zombies</option>
+                <option value='Terror'>Terror</option>
               </select>
             </div>
           </section>
@@ -83,7 +105,7 @@ function App () {
 
         <section id='container-books' className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[300px] gap-5 overflow-y-auto'>
           {
-            books.map(({ book }) => (
+            filteredBooks.map(({ book }) => (
               <article className={`relative w-full h-full overflow-hidden rounded-md ${book.inList ? 'before:absolute before:inset-0 before:bg-black/80 before:rounded-md' : 'pointer-events-auto group'}`} key={book.ISBN}>
                 <img className='object-cover w-full h-full' src={book.cover} alt={book.title} />
                 <div className='absolute inset-0 bg-black/80 text-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all'>
