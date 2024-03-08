@@ -26,10 +26,5 @@ body{
   border-radius: 10px;
 }
 
-.grid-books{
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
-}
-
 
 
