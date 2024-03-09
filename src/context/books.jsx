@@ -4,27 +4,33 @@ import data from '../libs/books.json'
 export const BooksContext = createContext()
 
 export const BooksProvider = ({ children }) => {
-  const [books, setBooks] = useState(data.library)
-  const [bookList, setBookList] = useState([])
+  const [books, setBooks] = useState(() => {
+    const isLocalStorage = JSON.parse(window.localStorage.getItem('books'))
+    return isLocalStorage || data.library
+  })
+  const [bookList, setBookList] = useState(() => {
+    const isLocalStorage = JSON.parse(window.localStorage.getItem('bookList'))
+    return isLocalStorage || []
+  })
 
   const addBookToList = (ISBN) => {
     const foundBook = [...books].find(({ book }) => book.ISBN === ISBN)
     if (!foundBook) return
 
-    setBookList(prevList => {
-      const newList = [...prevList, foundBook]
-      return newList
+    const newList = [...bookList, foundBook]
+
+    setBookList(newList)
+
+    const newBooks = books.map(item => {
+      if (item.book !== foundBook.book) return item
+      item.book.inList = true
+      return item
     })
 
-    setBooks(prevBooks => {
-      const newBooks = prevBooks.map(item => {
-        if (item.book !== foundBook.book) return item
-        item.book.inList = true
-        return item
-      })
+    setBooks(newBooks)
 
-      return newBooks
-    })
+    window.localStorage.setItem('books', JSON.stringify(newBooks))
+    window.localStorage.setItem('bookList', JSON.stringify(newList))
   }
 
   const removeBookFromList = (ISBN) => {
@@ -32,20 +38,20 @@ export const BooksProvider = ({ children }) => {
 
     if (!foundBook) return
 
-    setBookList(prevList => {
-      const newList = prevList.filter(item => item.book !== foundBook.book)
-      return newList
+    const newList = [...bookList].filter(item => item.book !== foundBook.book)
+
+    setBookList(newList)
+
+    const newBooks = [...books].map(item => {
+      if (item.book !== foundBook.book) return item
+      item.book.inList = false
+      return item
     })
 
-    setBooks(prevBooks => {
-      const newBooks = prevBooks.map(item => {
-        if (item.book !== foundBook.book) return item
-        item.book.inList = false
-        return item
-      })
+    setBooks(newBooks)
 
-      return newBooks
-    })
+    window.localStorage.setItem('books', JSON.stringify(newBooks))
+    window.localStorage.setItem('bookList', JSON.stringify(newList))
   }
 
   const totalBookList = [...bookList].length
