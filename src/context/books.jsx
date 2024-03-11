@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import data from '../libs/books.json'
 
 export const BooksContext = createContext()
@@ -32,6 +32,29 @@ export const BooksProvider = ({ children }) => {
     window.localStorage.setItem('books', JSON.stringify(newBooks))
     window.localStorage.setItem('bookList', JSON.stringify(newList))
   }
+
+  useEffect(() => {
+    const localStorageDataBooks = (event) => {
+      setBooks(prevBooks => {
+        if (event.key === 'books') {
+          const newBooks = JSON.parse(window.localStorage.getItem('books'))
+          return newBooks
+        }
+        return prevBooks
+      })
+      setBookList(prevList => {
+        if (event.key === 'bookList') {
+          const newBookList = JSON.parse(window.localStorage.getItem('bookList'))
+          return newBookList
+        }
+        return prevList
+      })
+    }
+
+    window.addEventListener('storage', localStorageDataBooks)
+
+    return () => window.removeEventListener('storage', localStorageDataBooks)
+  }, [])
 
   const removeBookFromList = (ISBN) => {
     const foundBook = [...bookList].find(({ book }) => book.ISBN === ISBN)

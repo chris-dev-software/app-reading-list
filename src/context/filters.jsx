@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { useBooks } from '../hooks/useBooks'
 
 export const FiltersContext = createContext()
@@ -13,6 +13,22 @@ export const FiltersProvider = ({ children }) => {
       genre: 'all'
     }
   })
+
+  useEffect(() => {
+    const localStorageData = (event) => {
+      setFilters(prevFilters => {
+        if (event.key === 'filters') {
+          const newFilters = JSON.parse(window.localStorage.getItem('filters'))
+          return newFilters
+        }
+        return prevFilters
+      })
+    }
+
+    window.addEventListener('storage', localStorageData)
+
+    return () => window.removeEventListener('storage', localStorageData)
+  }, [])
 
   const handleChangeRange = (event) => {
     const newRange = Number(event.target.value)
